@@ -6,10 +6,14 @@ const io = require('socket.io')(http);
 const productsRouter = require('./routes/products');
 const cartsRouter = require('./routes/carts');
 const viewsRouter = require('./routes/views');
+const sessionsRouter = require('./routes/sessions');
 const CartManager = require('./managers/CartManager');
 const ProductManager = require('./managers/ProductManager');
 const mongoose = require('mongoose');
+const passport = require('passport');
+const cookieParser = require('cookie-parser');
 require('dotenv').config();
+require('./config/passport');
 
 const cartManager = new CartManager();
 const productManager = new ProductManager();
@@ -21,9 +25,12 @@ app.set('views', __dirname + '/views');
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(__dirname + '/public'));
+app.use(cookieParser());
+app.use(passport.initialize());
 
 app.use('/api/products', productsRouter);
 app.use('/api/carts', cartsRouter);
+app.use('/api/sessions', sessionsRouter);
 app.use('/', viewsRouter);
 
 const handleSocketError = (socket, error, message) => {
